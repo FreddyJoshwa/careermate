@@ -81,7 +81,7 @@ Rules:
 
     try:
         response = client.chat.completions.create(
-           model="llama-3.3-70b-versatile",      # best quality
+           model="llama-3.1-8b-instant",      # best quality
             # model="llama3-8b-8192",     # faster alternative
             temperature=0.2,
             messages=[
