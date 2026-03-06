@@ -1,6 +1,9 @@
 from groq import Groq
 import os
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
@@ -42,12 +45,11 @@ IMPORTANT:
 
     response = client.chat.completions.create(
         model=MODEL,
-        messages=[{"role":"user","content":prompt}]
+        messages=[{"role": "user", "content": prompt}]
     )
 
     raw = response.choices[0].message.content.strip()
 
-    # Safe JSON extraction (in case model adds extra text)
     start = raw.find("{")
     end = raw.rfind("}")
     raw_json = raw[start:end+1]

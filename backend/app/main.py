@@ -3,7 +3,7 @@ from app.routes import auth
 from app.database import Base, engine
 from app.routes import resume 
 from app.routes import roadmap
-
+from app.models.course import Course
 
 
 Base.metadata.create_all(bind=engine)

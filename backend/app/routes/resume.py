@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models.resume import Resume
 from app.core.security import HTTPBearer, verify_token
+from app.services.roadmap_service import create_roadmap
 import os
 from app.utils.parcer import parse_resume, analyze_resume
+from app.services.course_service import get_recommended_courses
 
 router = APIRouter()
 security = HTTPBearer()
@@ -40,6 +42,9 @@ async def upload_resume(
     text = parse_resume(file_path)
     analysis = analyze_resume(text, goals)
 
+    # Generate roadmap from analyzed skills
+    roadmap = create_roadmap(goals, analysis["skills"], analysis["missing_skills"])
+    recommended_courses = get_recommended_courses(db, analysis["missing_skills"])
     # Save to DB
     resume = db.query(Resume).filter(Resume.user_id == user_id).first()
     if resume:
@@ -61,8 +66,10 @@ async def upload_resume(
     db.refresh(resume)
 
     return {
-        "message": "Resume uploaded and analyzed",
+        "message": "Resume uploaded, analyzed, and roadmap generated",
         "skills": analysis["skills"],
         "missing_skills": analysis["missing_skills"],
-        "goals": goals
+        "goals": goals,
+        "roadmap": roadmap,
+        "recommended_courses": recommended_courses
     }
