@@ -7,6 +7,8 @@ from app.services.roadmap_service import create_roadmap
 import os
 from app.utils.parcer import parse_resume, analyze_resume
 from app.services.course_service import get_recommended_courses
+from app.services.task_service import create_tasks_from_roadmap
+
 
 router = APIRouter()
 security = HTTPBearer()
@@ -45,7 +47,9 @@ async def upload_resume(
     # Generate roadmap from analyzed skills
     roadmap = create_roadmap(goals, analysis["skills"], analysis["missing_skills"])
     recommended_courses = get_recommended_courses(db, analysis["missing_skills"])
-    # Save to DB
+    tasks = create_tasks_from_roadmap(db, user_id, goals, roadmap, week="week1")
+
+
     resume = db.query(Resume).filter(Resume.user_id == user_id).first()
     if resume:
         resume.resume_file = file_path
@@ -71,5 +75,6 @@ async def upload_resume(
         "missing_skills": analysis["missing_skills"],
         "goals": goals,
         "roadmap": roadmap,
-        "recommended_courses": recommended_courses
+        "recommended_courses": recommended_courses,
+        "daily_tasks": tasks
     }
